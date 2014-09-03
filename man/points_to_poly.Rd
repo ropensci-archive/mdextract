@@ -28,7 +28,7 @@ point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_poin
  nrow=nrow(example_points),ncol=2)
 poly <- points_to_poly(point_matrix)
 plot(point_matrix)
-plot_poly(poly)
+lines(poly)
 }
 \author{
 Jordan S. Read

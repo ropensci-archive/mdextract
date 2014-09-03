@@ -17,7 +17,7 @@
 #'  nrow=nrow(example_points),ncol=2)
 #'poly <- points_to_poly(point_matrix)
 #'plot(point_matrix)
-#'plot_poly(poly)
+#'lines(poly)
 #'@export
 points_to_poly <- function(pts, method = 'convex'){
   
@@ -26,19 +26,80 @@ points_to_poly <- function(pts, method = 'convex'){
   # if data.frame, convert to matrix...
 
   sp <- ashape(x=unique(pts), alpha = 10)
-  ind_1 <- sort.int(sp$edges[, 1], index.return = T)$ix
-  ind_2 <- sort.int(sp$edges[, 2], index.return = T)$ix
   
-  x <- vector(length = length(sp$edges[, 1])*2)
-  x[seq(1,length(x),2)] <- sp$edges[ind_2, 3]
-  x[seq(2,length(x),2)] <- sp$edges[ind_2, 5]
-  y <- x
-  y[seq(1,length(x),2)] <- sp$edges[ind_2, 4]
-  y[seq(2,length(x),2)] <- sp$edges[ind_2, 6]
-
-  poly = matrix(c(x, y), ncol = 2)
-
-    
+  x1 <- sp$edges[, 3]
+  y1 <- sp$edges[, 4]
+  x2 <- sp$edges[, 5]
+  y2 <- sp$edges[, 6]
   
+  in1 <- sp$edges[, 1]
+  in2 <- sp$edges[, 2]
+  segments <- matrix(c(in1, in2, x1, y1, x2, y2), ncol = 6)
+  
+  poly <- order_segments(segments)
   return(poly)
 }
+
+order_segments <- function(segments){
+  # must close ring
+  ring <- matrix(nrow = nrow(segments)*2+1, ncol = 2)
+  ring[1, 1:2] <- segments[1, 3:4]
+  r_cnt <- 2
+  prev_match <- segments[1, 2] # the opposite index match
+  prev_i <- 1
+  for (j in 1: (nrow(segments)-1)){
+    matches <- which(prev_match == segments[, 2])
+    
+    if (length(matches) == 0){
+      # flip!
+      matches <- which(prev_match == segments[, 1])
+      match_i <- matches[matches!= prev_i]
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 3:4]
+      r_cnt <- r_cnt + 1
+      prev_match <- segments[prev_i, 2]
+    } else if (length(matches) == 1){
+      
+      match_i <- which(prev_match == segments[, 1])
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
+      r_cnt <- r_cnt + 1
+      prev_match <- segments[prev_i, 1]
+    } else {
+      match_i <- matches[matches!= prev_i]
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
+      r_cnt <- r_cnt + 1
+      prev_match <- segments[prev_i, 1]
+    }
+    
+    matches <- which(prev_match == segments[, 1])
+    if (length(matches) == 1){
+      # switch sides!
+      match_i <- which(prev_match == segments[, 2])
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
+      r_cnt <- r_cnt + 1
+      prev_match <- segments[prev_i, 1]
+    } else if (length(matches) == 0){
+      # switch sides!
+      matches <- which(prev_match == segments[, 2])
+      match_i <- matches[matches!= prev_i]
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
+      r_cnt <- r_cnt + 1
+      prev_match <- segments[prev_i, 1]
+    } else{
+      match_i <- matches[matches!= prev_i]
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 3:4]
+      r_cnt <- r_cnt + 1
+      prev_match <- segments[prev_i, 2]
+    }
+    
+  }
+  ring <- ring[!is.na(ring[, 1]), ]
+ 
+  return(ring)
+}
+

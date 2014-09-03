@@ -1,14 +1,13 @@
-#' automatically generate coverages for a spocc search
-#' @description This function will automatically generate metadata for spocc queries that can then be converted to other standards.
-#' @param lonlat a 2 x n matrix of longitude-latitude coordinates
+#' @title Automatically calculate a bounding box for your points
+#' @description Take a 2 x n matrix of lat/lon coordinates and convert them to a bounding box
+#' @param points a 2 x n matrix or dataframe of lat/long coordinates
+#' @return a vector of boundings points as specified by EML - A sequence of: westBoundingCoordinate, eastBoundingCoordinate, northBoundingCoordinate, southBoundingCoordinate 	
 #' @export
-bounding_box <- function(lonlat){
-  spatial<- list()
-  spatial$polygon <- "Bounding box"
-    coord <- rbind(apply(out[,2:3],2,min),apply(out[,2:3],2,max))
-    spatial$coord$UR <- coord[2,]
-    spatial$coord$LL <- coord[1,]
-    spatial$coord$UL <- c(coord[1,1],coord[2,2])
-    spatial$coord$LR <- c(coord[2,1],coord[1,2])
+
+bounding_box <- function(points){
+  
+    coord <- rbind(apply(points,2,min),apply(poinst,2,max))
+    
+    
   return(spatial)
 }

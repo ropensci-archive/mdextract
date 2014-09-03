@@ -11,8 +11,10 @@
 #'@author Jordan S. Read
 #'@import rgdal
 #'@examples 
-#'example_points <- read.table(file='../example_data.tsv',header=T,sep='\t')
-#'point_matrix <- matrix(as.numeric(c(example_points[, 2],example_points[, 1])),nrow=nrow(example_points),ncol=2)
+#'file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
+#'example_points <- read.table(file=file_nm,header=T,sep=',')
+#'point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
+#'  nrow=nrow(example_points),ncol=2)
 #'points_to_poly(point_matrix)
 #'@export
 points_to_poly <- function(points, shape = 'convex'){

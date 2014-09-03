@@ -47,56 +47,42 @@ order_segments <- function(segments){
   r_cnt <- 2
   prev_match <- segments[1, 2] # the opposite index match
   prev_i <- 1
-  for (j in 1: (nrow(segments)-1)){
+  for (j in 1:nrow(segments)){
     matches <- which(prev_match == segments[, 2])
     
     if (length(matches) == 0){
       # flip!
       matches <- which(prev_match == segments[, 1])
       match_i <- matches[matches!= prev_i]
-      prev_i <- match_i
       ring[r_cnt, 1:2] <- segments[match_i, 3:4]
-      r_cnt <- r_cnt + 1
+      prev_i <- match_i
       prev_match <- segments[prev_i, 2]
-    } else if (length(matches) == 1){
-      
-      match_i <- which(prev_match == segments[, 1])
-      prev_i <- match_i
-      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
-      r_cnt <- r_cnt + 1
-      prev_match <- segments[prev_i, 1]
     } else {
-      match_i <- matches[matches!= prev_i]
-      prev_i <- match_i
+      match_i <- ifelse(length(matches) == 1, which(prev_match == segments[, 1]), matches[matches!= prev_i])
       ring[r_cnt, 1:2] <- segments[match_i, 5:6]
-      r_cnt <- r_cnt + 1
+      prev_i <- match_i
       prev_match <- segments[prev_i, 1]
     }
     
+    r_cnt <- r_cnt + 1
+    
+    # other side
     matches <- which(prev_match == segments[, 1])
-    if (length(matches) == 1){
-      # switch sides!
-      match_i <- which(prev_match == segments[, 2])
-      prev_i <- match_i
-      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
-      r_cnt <- r_cnt + 1
-      prev_match <- segments[prev_i, 1]
-    } else if (length(matches) == 0){
+    if (length(matches) <= 1){
       # switch sides!
       matches <- which(prev_match == segments[, 2])
-      match_i <- matches[matches!= prev_i]
-      prev_i <- match_i
+      match_i <- ifelse(length(matches) == 1, matches, matches[matches!= prev_i])
       ring[r_cnt, 1:2] <- segments[match_i, 5:6]
-      r_cnt <- r_cnt + 1
+      prev_i <- match_i
       prev_match <- segments[prev_i, 1]
     } else{
       match_i <- matches[matches!= prev_i]
-      prev_i <- match_i
       ring[r_cnt, 1:2] <- segments[match_i, 3:4]
-      r_cnt <- r_cnt + 1
+      prev_i <- match_i
       prev_match <- segments[prev_i, 2]
     }
     
+    r_cnt <- r_cnt + 1
   }
   ring <- ring[!is.na(ring[, 1]), ]
  

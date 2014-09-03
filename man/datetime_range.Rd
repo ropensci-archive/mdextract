@@ -9,8 +9,8 @@ datetime_range(datetimes, type = "simple")
 \item{datetimes}{A vector of \code{POSIXt} or \code{date}}
 }
 \value{
-A matrix of size nX2 representing the first and last datetimes.
-Type \quote{simple} always returns only one first/last pair.
+A data.frame with columns \code{starts} and \code{ends}.
+Type \code{simple} always returns only one start/end pair.
 }
 \description{
 Take a vector of datetimes and calculate the range

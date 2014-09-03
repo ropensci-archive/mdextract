@@ -1,8 +1,8 @@
 #' @title Automatically calculate start/end datetime range for your data 
 #' @description Take a vector of datetimes and calculate the range
 #' @param datetimes A vector of \code{POSIXt} or \code{date} 
-#' @return A matrix of size nX2 representing the first and last datetimes. 
-#' Type \quote{simple} always returns only one first/last pair.
+#' @return A data.frame with columns \code{starts} and \code{ends}. 
+#' Type \code{simple} always returns only one start/end pair.
 #' @import mclust
 #' @export
 datetime_range<- function(datetimes, type="simple"){

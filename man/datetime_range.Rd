@@ -3,13 +3,14 @@
 \alias{datetime_range}
 \title{Automatically calculate start/end datetime range for your data}
 \usage{
-datetime_range(datetimes)
+datetime_range(datetimes, type = "simple")
 }
 \arguments{
 \item{datetimes}{A vector of \code{POSIXt} or \code{date}}
 }
 \value{
-A vector of length 2 representing the first and last datetime
+A matrix of size nX2 representing the first and last datetimes.
+Type \quote{simple} always returns only one first/last pair.
 }
 \description{
 Take a vector of datetimes and calculate the range

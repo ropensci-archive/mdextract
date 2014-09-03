@@ -9,7 +9,7 @@
 elevation <- function(pts){
   base <- "http://maps.googleapis.com/maps/api/elevation/json?locations="
   ## Create vector of lat/lon pairs
-  llpairs <- apply(pts[1:480,],1,function(x){out <- sapply(x,as.character); paste(out,collapse=",")})
+  llpairs <- apply(pts,function(x){out <- sapply(x,as.character); paste(out,collapse=",")})
   loops <- ceiling(length(llpairs) / 100)
   if(loops < 2){
     gpts <- paste(llpairs,collapse="|")

@@ -26,8 +26,9 @@ file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
 example_points <- read.table(file=file_nm,header=T,sep=',')
 point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
  nrow=nrow(example_points),ncol=2)
-plot(points_to_poly(point_matrix))
-points(point_matrix)
+poly <- points_to_poly(point_matrix)
+plot(point_matrix)
+plot_poly(poly)
 }
 \author{
 Jordan S. Read

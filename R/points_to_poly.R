@@ -15,8 +15,9 @@
 #'example_points <- read.table(file=file_nm,header=T,sep=',')
 #'point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
 #'  nrow=nrow(example_points),ncol=2)
-#'plot(points_to_poly(point_matrix))
-#'points(point_matrix)
+#'poly <- points_to_poly(point_matrix)
+#'plot(point_matrix)
+#'plot_poly(poly)
 #'@export
 points_to_poly <- function(pts, method = 'convex'){
   
@@ -25,8 +26,16 @@ points_to_poly <- function(pts, method = 'convex'){
   # if data.frame, convert to matrix...
 
   sp <- ashape(x=unique(pts), alpha = 10)
-  x <- c(sp$edges[,3], sp$edges[,5])
-  y <- c(sp$edges[,4], sp$edges[,6])
+  ind_1 <- sort.int(sp$edges[, 1], index.return = T)$ix
+  ind_2 <- sort.int(sp$edges[, 2], index.return = T)$ix
+  
+  x <- vector(length = length(sp$edges[, 1])*2)
+  x[seq(1,length(x),2)] <- sp$edges[ind_2, 3]
+  x[seq(2,length(x),2)] <- sp$edges[ind_2, 5]
+  y <- x
+  y[seq(1,length(x),2)] <- sp$edges[ind_2, 4]
+  y[seq(2,length(x),2)] <- sp$edges[ind_2, 6]
+
   poly = matrix(c(x, y), ncol = 2)
 
     

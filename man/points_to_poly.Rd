@@ -3,14 +3,14 @@
 \alias{points_to_poly}
 \title{create polygon from series of points}
 \usage{
-points_to_poly(points, shape = "convex")
+points_to_poly(pts, method = "convex")
 }
 \arguments{
-\item{points}{a matrix of latitute and longitude points, or a data.frame with
+\item{pts}{a matrix of latitute and longitude points, or a data.frame with
 \code{latitude} and \code{longitude} as column names}
 
-\item{shape}{a string specifying the shape of the polygon, defaults as
-\code{'convex'}. Can be either \code{'convex'} or \code{'concave'}}
+\item{method}{a string specifying the shape of the polygon, defaults as
+\code{'convex'}. Currently \code{'convex'} is the only supported method.}
 }
 \value{
 a data.frame of latitude and longitude points representing the spatial footprint of the data
@@ -26,7 +26,8 @@ file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
 example_points <- read.table(file=file_nm,header=T,sep=',')
 point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
  nrow=nrow(example_points),ncol=2)
-points_to_poly(point_matrix)
+plot(points_to_poly(point_matrix))
+points(point_matrix)
 }
 \author{
 Jordan S. Read

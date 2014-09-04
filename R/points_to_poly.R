@@ -26,23 +26,50 @@ points_to_poly <- function(pts, method = 'convex'){
   # if data.frame, convert to matrix...
 
   alpha_val <- get_alpha(pts)
-  sp <- ashape(x=unique(pts), alpha = alpha_val)
   
-  x1 <- sp$edges[, 3]
-  y1 <- sp$edges[, 4]
-  x2 <- sp$edges[, 5]
-  y2 <- sp$edges[, 6]
-  
-  in1 <- sp$edges[, 1]
-  in2 <- sp$edges[, 2]
-  segments <- matrix(c(in1, in2, x1, y1, x2, y2), ncol = 6)
+  segments <- build_segs(pts, alpha_val)
   
   poly <- order_segments(segments)
   return(poly)
 }
 
+build_segs <- function(pts, alpha){
+  orig_alpha <- alpha
+  is_blob <- F
+  step_m = 1.2 # growth parameter
+  while (!is_blob){
+    sp <- ashape(x=unique(pts), alpha = alpha)
+    
+    x1 <- sp$edges[, 3]
+    y1 <- sp$edges[, 4]
+    x2 <- sp$edges[, 5]
+    y2 <- sp$edges[, 6]
+    
+    in1 <- sp$edges[, 1]
+    in2 <- sp$edges[, 2]
+    segments <- matrix(c(in1, in2, x1, y1, x2, y2), ncol = 6)
+    is_blob <- is_blob(segments)
+    alpha = alpha*step_m
+  }
+  return(segments)
+}
+
+is_blob <- function(segments){
+  # false if any deadend vectors or multiple blobs
+  solo = vector(length = nrow(segments))
+  for (j in 1:nrow(segments)){
+    i_1 <- segments[j,1]
+    i_2 <- segments[j,2]
+    t_1 <- segments[-j, 1]
+    t_2 <- segments[-j, 2]
+    if (sum(i_1 == t_1 | i_1 == t_2) != 1 | sum(i_2 == t_1 | i_2 == t_2) != 1){
+      solo[j] <- T
+    }
+  }
+  return(ifelse(all(!solo), T, F))
+}
 get_alpha <- function(pts){
-  scl <- 20
+  scl <- 5
   x_vals <- sort(unique(pts[, 1]))
   y_vals <- sort(unique(pts[, 2]))
   
@@ -50,20 +77,6 @@ get_alpha <- function(pts){
   return(alpha)
 }
 
-remove_solos <- function(segments){
-  #get rid of the deadend vectors (those that have no pair)
-  solo = vector(length = nrow(segments))
-  for (j in 1:nrow(segments)){
-    i_1 <- segments[j,1]
-    i_2 <- segments[j,2]
-    t_1 <- segments[-j, 1]
-    t_2 <- segments[-j, 2]
-    if (!any(i_1 == t_1 | i_1 == t_2) | !any(i_2 == t_1 | i_2 == t_2)){
-      solo[j] <- T
-    }
-  }
-  return(segments[!solo,])
-}
 segment_cleaner <- function(segments){
   clean_pile <- matrix(segments[1, ],ncol=6)
   segments = segments[-1, ]

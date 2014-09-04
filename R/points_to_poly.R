@@ -57,11 +57,11 @@ segment_cleaner <- function(segments){
       clean_pile <- rbind(clean_pile, segments[nxt_i, c(2,1,5,6,3,4)])
       
     }
-    segments = segments[-nxt_i, ]
+    segments = matrix(segments[-nxt_i, ], ncol=6)
   }
   
   #last index
-  if(is.null(nrow(segments))){
+  if(nrow(segments) == 0){
     return(clean_pile)
   }
   if (segments[1] == clean_pile[1,1]){
@@ -71,38 +71,7 @@ segment_cleaner <- function(segments){
   }
   return(clean_pile)
 }
-segment_flipper <- function(segments){
-  
-  flipped = F
-  old_seg = segments
-  cnt = 1
-  while (!flipped){
-    dup_i <- anyDuplicated(segments[,1])
-    
-    if (dup_i == 0 | nrow(segments) == 0){
-      old_seg[cnt:(cnt+nrow(segments)-1), ] <- segments
-      flipped = T
-    } else {
-      other_dup <- head(which(segments[, 1] == segments[dup_i, 1]),1)
-      
-      # if duplicated, flip it and lock it away
-      # test to see that this is an actual improvement
-      old_seg[cnt, c(1,3,4)] <- segments[dup_i, c(2,5,6)]
-      old_seg[cnt, c(2,5,6)] <- segments[dup_i, c(1,3,4)]
-      cnt = cnt+1
-      old_seg[cnt, c(1,3,4)] <- segments[other_dup, c(1,3,4)]
-      old_seg[cnt, c(2,5,6)] <- segments[other_dup, c(2,5,6)]
-      cnt = cnt+1
-      segments <- segments[c(-dup_i, -other_dup), ]
-    }
-    
-  }
-  
-  
-  segments <- old_seg
-  return(segments)
-  
-}
+
 order_segments <- function(segments){
   # must close ring
   segments <- segment_cleaner(segments)
@@ -112,9 +81,6 @@ order_segments <- function(segments){
   prev_match <- segments[1, 2] # the opposite index match
   prev_i <- 1
   for (j in 1:nrow(segments)){
-    if (prev_match == 60){
-      cat('sdf')
-    }
     matches <- which(prev_match == segments[, 2])
     if (length(matches) == 0){
       

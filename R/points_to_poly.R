@@ -40,18 +40,55 @@ points_to_poly <- function(pts, method = 'convex'){
   return(poly)
 }
 
+segment_flipper <- function(segments){
+  
+  flipped = F
+  old_seg = segments
+  cnt = 1
+  while (!flipped){
+    dup_i <- anyDuplicated(segments[,1])
+    
+    if (dup_i == 0 | nrow(segments) == 0){
+      old_seg[cnt:(cnt+nrow(segments)-1), ] <- segments
+      flipped = T
+    } else {
+      other_dup <- head(which(segments[, 1] == segments[dup_i, 1]),1)
+      
+      # if duplicated, flip it and lock it away
+      old_seg[cnt, c(1,3,4)] <- segments[dup_i, c(2,5,6)]
+      old_seg[cnt, c(2,5,6)] <- segments[dup_i, c(1,3,4)]
+      cnt = cnt+1
+      old_seg[cnt, c(1,3,4)] <- segments[other_dup, c(1,3,4)]
+      old_seg[cnt, c(2,5,6)] <- segments[other_dup, c(2,5,6)]
+      cnt = cnt+1
+      segments <- segments[c(-dup_i, -other_dup), ]
+    }
+    
+  }
+  
+  
+  old_seg[flip_i, c(1,3,5)] <- seg_2
+  old_seg[flip_i, c(2,4,6)] <- seg_1
+  return(segments)
+  
+}
 order_segments <- function(segments){
   # must close ring
+  segments <- segment_flipper(segments)
   ring <- matrix(nrow = nrow(segments)*2+1, ncol = 2)
   ring[1, 1:2] <- segments[1, 3:4]
   r_cnt <- 2
   prev_match <- segments[1, 2] # the opposite index match
   prev_i <- 1
   for (j in 1:nrow(segments)){
+    if (prev_match == 60){
+      cat('sdf')
+    }
     matches <- which(prev_match == segments[, 2])
     if (length(matches) == 0){
       
       # flip!
+      cat('flip')
       matches <- which(prev_match == segments[, 1])
       match_i <- matches[matches!= prev_i]
       ring[r_cnt, 1:2] <- segments[match_i, 3:4]

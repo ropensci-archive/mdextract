@@ -40,6 +40,34 @@ points_to_poly <- function(pts, method = 'convex'){
   return(poly)
 }
 
+segment_cleaner <- function(segments){
+  
+  clean_pile <- matrix(segments[1, ],ncol=6)
+  segments = segments[-1, ]
+  for (j in 1:(nrow(segments) -1)){
+    # do we need to flip?
+    u_i <- tail(clean_pile[, 2], 1)
+    
+    nxt_i <- which(u_i== segments[, 2])
+    if (length(nxt_i) == 0){
+      # no flip, add to clean
+      nxt_i <- which(u_i== segments[, 1])
+      clean_pile <- rbind(clean_pile, segments[nxt_i, ])
+    } else {
+      clean_pile <- rbind(clean_pile, segments[nxt_i, c(2,1,5,6,3,4)])
+      
+    }
+    segments = segments[-nxt_i, ]
+  }
+  
+  #last index
+  if (segments[1] == clean_pile[1,1]){
+    clean_pile <- rbind(clean_pile, segments[c(2,1,5,6,3,4)])
+  } else {
+    clean_pile <- rbind(clean_pile, matrix(segments, ncol=6))
+  }
+  return(clean_pile)
+}
 segment_flipper <- function(segments){
   
   flipped = F
@@ -55,6 +83,7 @@ segment_flipper <- function(segments){
       other_dup <- head(which(segments[, 1] == segments[dup_i, 1]),1)
       
       # if duplicated, flip it and lock it away
+      # test to see that this is an actual improvement
       old_seg[cnt, c(1,3,4)] <- segments[dup_i, c(2,5,6)]
       old_seg[cnt, c(2,5,6)] <- segments[dup_i, c(1,3,4)]
       cnt = cnt+1
@@ -67,14 +96,13 @@ segment_flipper <- function(segments){
   }
   
   
-  old_seg[flip_i, c(1,3,5)] <- seg_2
-  old_seg[flip_i, c(2,4,6)] <- seg_1
+  segments <- old_seg
   return(segments)
   
 }
 order_segments <- function(segments){
   # must close ring
-  segments <- segment_flipper(segments)
+  segments <- segment_cleaner(segments)
   ring <- matrix(nrow = nrow(segments)*2+1, ncol = 2)
   ring[1, 1:2] <- segments[1, 3:4]
   r_cnt <- 2

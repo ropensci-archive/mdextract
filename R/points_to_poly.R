@@ -61,6 +61,9 @@ segment_cleaner <- function(segments){
   }
   
   #last index
+  if(is.null(nrow(segments))){
+    return(clean_pile)
+  }
   if (segments[1] == clean_pile[1,1]){
     clean_pile <- rbind(clean_pile, segments[c(2,1,5,6,3,4)])
   } else {

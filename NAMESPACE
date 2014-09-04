@@ -2,7 +2,8 @@
 
 export(bounding_box)
 export(coverage)
+export(datetime_range)
 export(points_to_poly)
-export(taxonomy_handler)
-import(rgdal)
-import(taxize)
+import(alphahull)
+import(httr)
+import(mclust)

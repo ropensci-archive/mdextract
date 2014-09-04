@@ -2,37 +2,95 @@
 #'
 #'@details creates a automatically generated footprint from a series of points
 #'
-#'@param points a matrix of latitute and longitude points, or a data.frame with 
+#'@param pts a matrix of latitute and longitude points, or a data.frame with 
 #'\code{latitude} and \code{longitude} as column names
-#'@param shape a string specifying the shape of the polygon, defaults as 
-#'\code{'convex'}. Can be either \code{'convex'} or \code{'concave'}
+#'@param method a string specifying the shape of the polygon, defaults as 
+#'\code{'convex'}. Currently \code{'convex'} is the only supported method.
 #'@return a data.frame of latitude and longitude points representing the spatial footprint of the data
 #'@keywords methods, math
 #'@author Jordan S. Read
-#'@import rgdal
+#'@import alphahull
 #'@examples 
 #'file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
 #'example_points <- read.table(file=file_nm,header=T,sep=',')
 #'point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
 #'  nrow=nrow(example_points),ncol=2)
-#'points_to_poly(point_matrix)
+#'poly <- points_to_poly(point_matrix)
+#'plot(point_matrix)
+#'lines(poly)
 #'@export
-points_to_poly <- function(points, shape = 'convex'){
+points_to_poly <- function(pts, method = 'convex'){
   
-  if (shape != 'convex' & shape != 'concave'){stop('shape must be either convex or concave')}
+  if (method != 'convex'){stop('method must be either convex or concave')}
   
   # if data.frame, convert to matrix...
+
+  sp <- ashape(x=unique(pts), alpha = 10)
   
-  ll.points <- SpatialPoints(coords= points,
-                             CRS("+init=epsg:2163"))
+  x1 <- sp$edges[, 3]
+  y1 <- sp$edges[, 4]
+  x2 <- sp$edges[, 5]
+  y2 <- sp$edges[, 6]
   
-  ll.points.tr <- spTransform(ll.points,CRS("+init=epsg:2163"))
+  in1 <- sp$edges[, 1]
+  in2 <- sp$edges[, 2]
+  segments <- matrix(c(in1, in2, x1, y1, x2, y2), ncol = 6)
   
-  buf1 <- gBuffer(ll.points.tr, width=90000,byid=T)
-  buf1_union <- gUnionCascaded(buf1) # Take the union -- so this polygon will
-  #contain all your points
-  poly = gBuffer(buf1_union,width=-75000)
-  
-  
+  poly <- order_segments(segments)
   return(poly)
 }
+
+order_segments <- function(segments){
+  # must close ring
+  ring <- matrix(nrow = nrow(segments)*2+1, ncol = 2)
+  ring[1, 1:2] <- segments[1, 3:4]
+  r_cnt <- 2
+  prev_match <- segments[1, 2] # the opposite index match
+  prev_i <- 1
+  for (j in 1:nrow(segments)){
+    matches <- which(prev_match == segments[, 2])
+    if (length(matches) == 0){
+      
+      # flip!
+      matches <- which(prev_match == segments[, 1])
+      match_i <- matches[matches!= prev_i]
+      ring[r_cnt, 1:2] <- segments[match_i, 3:4]
+      prev_i <- match_i
+      prev_match <- segments[prev_i, 2]
+    } else {
+      match_i <- ifelse(length(matches) == 1, which(prev_match == segments[, 1]), matches[matches!= prev_i])
+      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
+      prev_i <- match_i
+      prev_match <- segments[prev_i, 1]
+    }
+    
+    r_cnt <- r_cnt + 1
+    
+    # other side
+    matches <- which(prev_match == segments[, 1])
+    if (length(matches) == 1){
+      # switch sides!
+      match_i <- which(prev_match == segments[, 2])
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
+      prev_match <- segments[prev_i, 1]
+    } else if (length(matches) == 0){
+      # switch sides!
+      matches <- which(prev_match == segments[, 2])
+      match_i <- matches[matches!= prev_i]
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 5:6]
+      prev_match <- segments[prev_i, 1]
+    } else{
+      match_i <- matches[matches!= prev_i]
+      prev_i <- match_i
+      ring[r_cnt, 1:2] <- segments[match_i, 3:4]
+      prev_match <- segments[prev_i, 2]
+    }
+    r_cnt <- r_cnt + 1
+  }
+  ring <- ring[!is.na(ring[, 1]), ]
+ 
+  return(ring)
+}
+

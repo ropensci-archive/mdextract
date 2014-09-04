@@ -12,12 +12,19 @@ setClass("coverage", slots = c(name = "character",
                                 
 ))
 
+#' Constructor for coverage class
+#' 
+#' @export
+#' @docType methods
+#' @rdname coverage-methods
+
 setGeneric("coverage",function(name,spatial,temporal,taxanomic) {
   standardGeneric("coverage")
 })
+  
 
-setMethod("coverage", signature("character","list","list","list"),function(name,spatial,temporal,taxanomic){
-  cov <- new(coverage,name = "", spatial = list(),temporal=list(),taxanomic=list())
+setMethod("coverage", signature("character","list","list","list"),function(name = NULL,spatial=NULL,temporal=NULL,taxanomic=NULL){
+  cov <- new("coverage",name = name, spatial = spatial,temporal=temporal,taxanomic=taxanomic)
   return(cov)
 })
 

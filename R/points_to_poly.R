@@ -5,7 +5,7 @@
 #'@param pts a matrix of latitute and longitude points, or a data.frame with 
 #'\code{latitude} and \code{longitude} as column names
 #'@param method a string specifying the shape of the polygon, defaults as 
-#'\code{'convex'}. Currently \code{'convex'} is the only supported method.
+#'\code{'concave'}. Currently \code{'concave'} is the only supported method.
 #'@return a data.frame of latitude and longitude points representing the spatial footprint of the data
 #'@keywords methods, math
 #'@author Jordan S. Read
@@ -21,7 +21,7 @@
 #'@export
 points_to_poly <- function(pts, method = 'convex'){
   
-  if (method != 'convex'){stop('method must be either convex or concave')}
+  if (method != 'concave'){stop('method must be concave')}
   
   # if data.frame, convert to matrix...
 

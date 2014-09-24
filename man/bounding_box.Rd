@@ -16,9 +16,9 @@ Take a 2 x n matrix of lat/lon coordinates and convert them to a bounding box
 }
 \examples{
 file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
-example_points <- read.table(file=file_nm,header=T,sep=',')
+example_points <- read.csv(file=file_nm,header=T)
 
-ex_points = matrix(c(gbif_1$decimalLatitude, gbif_1$decimalLongitude), ncol=2)
+ex_points = matrix(c(example_points$decimalLatitude, example_points$decimalLongitude), ncol=2)
 
 ex_bb = bounding_box(ex_points)
 

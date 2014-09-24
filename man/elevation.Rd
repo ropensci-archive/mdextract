@@ -6,7 +6,7 @@
 elevation(pts)
 }
 \arguments{
-\item{points}{a 2 x n matrix or dataframe of lat/long coordinates in decimal degrees}
+\item{points}{a 2 x n matrix or dataframe of lat/lon coordinates in decimal degrees}
 }
 \value{
 a vector that gives the minimum and maximum elevation in meters

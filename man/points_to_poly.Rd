@@ -3,7 +3,7 @@
 \alias{points_to_poly}
 \title{create polygon from series of points}
 \usage{
-points_to_poly(pts, method = "convex")
+points_to_poly(pts, method = "concave")
 }
 \arguments{
 \item{pts}{a matrix of latitute and longitude points, or a data.frame with
@@ -26,7 +26,7 @@ file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
 example_points <- read.table(file=file_nm,header=T,sep=',')
 point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
  nrow=nrow(example_points),ncol=2)
-poly <- points_to_poly(point_matrix)
+poly <- pointsToPoly(point_matrix,method="concave")
 plot(point_matrix)
 lines(poly)
 }

@@ -2,9 +2,11 @@
 
 export(bounding_box)
 export(coverage)
+export(coverage_extract)
 export(datetime_range)
 export(points_to_poly)
 export(taxonomy_handler)
+exportMethods(coverage_extract)
 import(alphahull)
 import(httr)
 import(mclust)

@@ -1,6 +1,6 @@
 #' @title calculate elevation
 #' @description given a matrix of points, figure out the min and max elevations of the points using the google elevation API
-#' @param points a 2 x n matrix or dataframe of lat/long coordinates in decimal degrees
+#' @param points a 2 x n matrix or dataframe of lat/lon coordinates in decimal degrees
 #' @details Given the limited number of points that can be sent to the elevation API.  However too many points may cause the api to bork.
 #' @return a vector that gives the minimum and maximum elevation in meters
 #' @import httr
@@ -34,7 +34,7 @@ elevation <- function(pts){
   }
   minA <- ifelse(min(elvec,na.rm=T) < 0,0,min(elvec,na.rm=T))
   maxA <- max(elvec,na.rm=T)
-  return(c(minA,maxA))
+  return(list(min = minA,max =maxA))
 }
 
 

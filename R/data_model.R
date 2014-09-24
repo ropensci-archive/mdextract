@@ -5,10 +5,11 @@
 #' @slot taxanomic a list containing the taxanomic coverage metadata
 #'
 
-setClass("Coverage", slots = c(name = "character",
+setClass("coverage", slots = c(name = "character",
                                spatial = "list",
                                temporal = "list",
-                               taxanomic = "list"
+                               taxanomic = "list",
+                               data = "data.frame"
                                 
 ))
 
@@ -19,32 +20,81 @@ setGeneric("coverage",function(name,spatial,temporal,taxanomic) {
 ### Define constructor
 
 setMethod("coverage", signature(), function(){
-  cov <- new("Coverage",name = covName, spatial = list(),temporal=list(),taxanomic=list())
+  cov <- new("coverage",name = "", spatial = list(),temporal=list(),taxanomic=list(),data=data.frame())
   
   return(cov)
 })
 
 
-
-#' list formats
-#' @description list of all object formats registered in the DataONE Object Format Vocabulary.
-#' @param cnode a valid CNode object
+#' @title Extract coverages from a dataset.
+#' @description Extract temporal, spatial and taxanomic coverages from a dataset
+#' @param df The dataset to extract coverages from, this should be a dataframe.
+#' @param spatial a list of control parameters for extracting spatial coverages, see details for a full description
+#' @details Eeach coverage needs a corresponding list of parameters that specificy where the extractor can look for the appropriate data.  
+#' \itemize{ 
+#' \item {spatial} {a list that contains three control parameters}}
 #' @docType methods
-#' @author hart
-#' @return Returns a dataframe of all object formats registered in the DataONE Object Format Vocabulary.
-#' @examples
-#' \dontrun {
-#' cn <- CNode()
-#' listFormats(cn)
+#' @name coverage_extract-method
+#' @rdname coverage_extract-method
+#' @return Returns a coverage object with all coverages for a given dataset.
+#' @examples \dontrun{
+#' 
+#' Examp goes here
 #' }
 #' @export
-setGeneric("listFormats", function(cnode, ...) {
-  standardGeneric("listFormats")
+#' @import maps,mapdata
+
+setGeneric("coverage_extract", function(df,spatial) {
+  standardGeneric("coverage_extract")
 })
 
 
-#' @rdname listFormats-method
-#' @aliases listFormats
+#' @rdname coverage_extract-method
+#' @aliases coverage_extract
 #' @export
 
+setMethod("coverage_extract",signature("data.frame","list"),function(df,spatial){
+  # Generate new coverage with empty slots
+  out <- coverage()
+  out@data <- df
+  ### Get just points for processing spatial data
+  tmat <- cbind(df[[spatial$lat]],df[[spatial$lon]])
+  ### check if elevation is desired
+  if(spatial$elevation){
+    ele <- elevation(tmat)
+  } else {ele = NULL}
+  
+  
+  if(spatial$type == "box"){
+    bbox <- bounding_box(tmat)
+    blist <- list(type = spatial$type,bbox = bbox, elevation = ele)
+    out@spatial <- blist
+    
+   } else if(spatial$type == "poly"){
+    poly <- points_to_poly(tmat)
+    
+    polylist <- list(type = spatial$type, poly = poly, elevation = ele)
+    out@spatial <- polylist
+  }
+  
+  
+  return(out)
+})
 
+
+
+
+setMethod("plot",list(x = "coverage"),  function(x,type="spatial",...){
+  if(type == "spatial"){
+    if(x@spatial$type == "box"){
+      map("worldHires")
+      rect(x@spatial$bbox[1], x@spatial$bbox[3], x@spatial$bbox[2], x@spatial$bbox[4],lty=2,lwd=3)
+      
+    }
+    if(x@spatial$type == "poly"){
+      map("worldHires")
+      lines(x@spatial$poly[,2:1],lty=2,lwd=3)
+      
+    }
+  }
+})

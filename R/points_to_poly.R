@@ -15,11 +15,11 @@
 #'example_points <- read.table(file=file_nm,header=T,sep=',')
 #'point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
 #'  nrow=nrow(example_points),ncol=2)
-#'poly <- points_to_poly(point_matrix)
+#'poly <- pointsToPoly(point_matrix,method="concave")
 #'plot(point_matrix)
 #'lines(poly)
 #'@export
-points_to_poly <- function(pts, method = 'convex'){
+points_to_poly <- function(pts, method = 'concave'){
   
   if (method != 'concave'){stop('method must be concave')}
   

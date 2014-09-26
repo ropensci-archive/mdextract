@@ -2,13 +2,13 @@
 \docType{methods}
 \name{coverage_extract-method}
 \alias{coverage_extract}
-\alias{coverage_extract,data.frame,list-method}
+\alias{coverage_extract,data.frame-method}
 \alias{coverage_extract-method}
 \title{Extract coverages from a dataset.}
 \usage{
-coverage_extract(df, spatial)
+coverage_extract(df, spatial = NULL, temporal = NULL, taxanomxic = NULL)
 
-\S4method{coverage_extract}{data.frame,list}(df, spatial)
+\S4method{coverage_extract}{data.frame}(df, spatial, temporal)
 }
 \arguments{
 \item{df}{The dataset to extract coverages from, this should be a dataframe.}
@@ -27,7 +27,7 @@ Eeach coverage needs a corresponding list of parameters that specificy where the
 \item {spatial} {a list that contains three control parameters}}
 }
 \examples{
-\dontrun {
+\dontrun{
 
 Examp goes here
 }

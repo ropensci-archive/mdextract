@@ -10,14 +10,14 @@
 #'@keywords methods, math
 #'@author Jordan S. Read
 #'@import alphahull
-#'@examples 
-#'file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
+#'@examples \dontrun{
+#'#'file_nm <- system.file(package='mdextract','ext','data_gbif_1.csv')
 #'example_points <- read.table(file=file_nm,header=T,sep=',')
 #'point_matrix <- matrix(as.numeric(c(example_points$decimalLongitude,example_points$decimalLatitude)),
 #'  nrow=nrow(example_points),ncol=2)
 #'poly <- pointsToPoly(point_matrix,method="concave")
 #'plot(point_matrix)
-#'lines(poly)
+#'lines(poly)}
 #'@export
 points_to_poly <- function(pts, method = 'concave'){
   

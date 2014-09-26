@@ -42,9 +42,11 @@ setMethod("coverage", signature(), function(){
 #' Examp goes here
 #' }
 #' @export
-#' @import maps,mapdata
+#' @import maps
+#' @import mapdata
+#' @import dplyr
 
-setGeneric("coverage_extract", function(df,spatial) {
+setGeneric("coverage_extract", function(df,spatial = NULL, temporal = NULL, taxanomxic = NULL) {
   standardGeneric("coverage_extract")
 })
 
@@ -53,10 +55,11 @@ setGeneric("coverage_extract", function(df,spatial) {
 #' @aliases coverage_extract
 #' @export
 
-setMethod("coverage_extract",signature("data.frame","list"),function(df,spatial){
+setMethod("coverage_extract",signature("data.frame"),function(df,spatial,temporal){
   # Generate new coverage with empty slots
   out <- coverage()
   out@data <- df
+  if(!is.null(spatial)){
   ### Get just points for processing spatial data
   tmat <- cbind(df[[spatial$lat]],df[[spatial$lon]])
   ### check if elevation is desired
@@ -77,7 +80,26 @@ setMethod("coverage_extract",signature("data.frame","list"),function(df,spatial)
     out@spatial <- polylist
   }
   
-  
+}
+
+
+  if(!is.null(temporal)){
+      if(temporal$type == "simple" && is.null(temporal$group_by)){
+        date_df <- datetime_range(df[[temporal$date]])
+        out@temporal <- list(start=date_df$starts,end = date_df$ends)        
+      } else if(temporal$type=="clust" && is.null(temporal$group_by)){
+        date_df <- datetime_range(df[[temporal$date]],type="mclust")
+        out@temporal <- list(start=date_df$starts,end = date_df$ends)    
+      }
+      
+    if(!is.null(group_by)){
+      date_df <- cbind(df[[temporal$date]],df[[temporal$group_by]])
+      
+    }
+      
+      
+  }
+
   return(out)
 })
 

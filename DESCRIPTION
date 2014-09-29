@@ -11,4 +11,7 @@ Imports:
     taxize,
     alphahull,
     httr,
-    mclust
+    mclust,
+    maps,
+    mapdata,
+    dplyr
